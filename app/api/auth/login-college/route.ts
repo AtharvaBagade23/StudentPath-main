@@ -79,14 +79,14 @@ export async function POST(request: NextRequest) {
       token: college.college_token,
       type: 'college'
     }), {
-      httpOnly: true,
+      httpOnly: false,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
       path: '/'
     });
 
     response.cookies.set('authToken', college.college_token, {
-      httpOnly: true,
+      httpOnly: false,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
       path: '/'
