@@ -42,9 +42,6 @@ export async function GET(request: NextRequest) {
 
     connection = await pool.getConnection();
     
-    // IMPORTANT: Switch to the correct database
-    await connection.execute('USE StudentPath');
-    
     // Get college basic info (using your actual table structure)
     const [collegeResult] = await connection.execute<CollegeRow[]>(
       `SELECT id, college_name, email, college_token, is_active, created_at 
