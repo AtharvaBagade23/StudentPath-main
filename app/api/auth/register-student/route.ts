@@ -79,7 +79,7 @@ export async function POST(request: NextRequest) {
 
       // Update token usage count
       await connection.execute(
-        'UPDATE college_token SET usage_count = usage_count + 1 WHERE token = ?',
+        'UPDATE college_tokens SET usage_count = usage_count + 1 WHERE token = ?',
         [collegeToken]
       );
 
