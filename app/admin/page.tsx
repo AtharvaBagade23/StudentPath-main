@@ -62,16 +62,43 @@ export default function AdminDashboard() {
       setIsLoading(true);
       setError(null);
 
-      // Get college data from localStorage (set during login)
-      const storedCollegeData = localStorage.getItem('collegeData');
+      // Helper function to get data from cookies
+      const getCollegeDataFromCookies = () => {
+        if (typeof document !== 'undefined') {
+          const cookies = document.cookie.split(';');
+          const collegeDataCookie = cookies.find(cookie => 
+            cookie.trim().startsWith('collegeData=')
+          );
+          
+          if (collegeDataCookie) {
+            try {
+              const cookieValue = collegeDataCookie.split('=')[1];
+              return JSON.parse(decodeURIComponent(cookieValue));
+            } catch (error) {
+              console.error('Error parsing cookie:', error);
+            }
+          }
+        }
+        return null;
+      };
+
+      // Try localStorage first, then cookies
+      let storedCollegeData = localStorage.getItem('collegeData');
+      let college = null;
       
-      if (!storedCollegeData) {
+      if (storedCollegeData) {
+        college = JSON.parse(storedCollegeData);
+        console.log('📱 College data from localStorage:', college);
+      } else {
+        college = getCollegeDataFromCookies();
+        console.log('🍪 College data from cookies:', college);
+      }
+      
+      if (!college) {
         setError('No college data found. Please log in again.');
         router.push('/college-login');
         return;
       }
-
-      const college = JSON.parse(storedCollegeData);
       console.log('📊 Stored college data:', college);
 
       // Set initial college data from localStorage
