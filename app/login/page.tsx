@@ -231,6 +231,7 @@ export default function LoginPage() {
         const response = await fetch('/api/auth/login-admin', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
+          credentials: 'include', // 🔑 ensures cookies are sent
           body: JSON.stringify({ email, password })
         });
         const data = await response.json();

@@ -5,7 +5,7 @@ import pool from '@/lib/db';
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { email, password, collegeToken } = body;
+    const { email, password } = body;
 
     // Validate required fields
     if (!email || !password) {
@@ -15,11 +15,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // First validate the college token
+    // 🔑 Get token from cookies instead of body
+    const collegeToken = request.cookies.get('collegeToken')?.value;
     let collegeId = null;
+
     if (collegeToken) {
       const connection = await pool.getConnection();
-      
+
       const [tokenResult] = await connection.execute(
         `SELECT c.id, c.college_name, ct.usage_count, ct.max_usage, ct.is_active 
          FROM colleges c 
@@ -60,7 +62,7 @@ export async function POST(request: NextRequest) {
 
     const student = (students as any[])[0];
 
-    // If college token provided, verify student belongs to that college
+    // If token exists, check student belongs to that college
     if (collegeId && student.college_id !== collegeId) {
       connection.release();
       return NextResponse.json(
@@ -81,13 +83,14 @@ export async function POST(request: NextRequest) {
 
     connection.release();
 
-    // Remove sensitive data before sending response
+    // Remove sensitive data
     const { password_hash, ...studentData } = student;
 
     return NextResponse.json({
       success: true,
       message: 'Login successful',
-      student: studentData
+      student: studentData,
+      token: collegeToken || null
     });
 
   } catch (error) {
